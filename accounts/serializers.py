@@ -139,3 +139,30 @@ class TenantSignupSerializer(BaseSignupSerializer):
         return user
 
 
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(allow_null=True, allow_blank=True, required=False)
+    last_name = serializers.CharField(allow_null=True, allow_blank=True, required=False)
+    address = serializers.CharField(allow_null=True, allow_blank=True, required=False)
+    passport_id = serializers.CharField(allow_null=True, allow_blank=True, required=False)
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'address', 'passport_id', 'updated_at', 'email']
+        read_only_fields = ['updated_at', 'email']
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if value not in [None, ""]:
+                setattr(instance, attr, value)
+
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
+
+
+
+
+
+
+
+

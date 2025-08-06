@@ -15,7 +15,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import User
-from accounts.serializers import TenantSignupSerializer, LandlordSignupSerializer
+from accounts.permission import IsLandlordUser, IsTenantUser
+from accounts.serializers import TenantSignupSerializer, LandlordSignupSerializer, UserUpdateSerializer
 from rest_framework.decorators import api_view, action
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -94,7 +95,7 @@ class LoginView(APIView):
             access_expiry = datetime.fromtimestamp(access_token['exp'], timezone.utc)
             refresh_expiry = datetime.fromtimestamp(refresh['exp'], timezone.utc)
 
-            response = Response(status=status.HTTP_200_OK)
+            response = Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
             response.set_cookie(
                 key='access_token',
                 value=str(access_token),
@@ -133,7 +134,7 @@ class LogoutView(APIView):
         except TokenError as e:
             return Response({"detail": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
 
-        response = Response({'message': 'Login successful'}, status=status.HTTP_204_NO_CONTENT)
+        response = Response({'message': 'Logout successful'}, status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
 
@@ -144,4 +145,55 @@ class LogoutView(APIView):
 # "email":"user1@user.com",
 # "password":"user1user1"
 # }
+
+
+class UserUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserUpdateSerializer
+
+    def put(self, request):
+        user = request.user
+        serializer = self.serializer_class(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        user = request.user
+        serializer = self.serializer_class(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LandlordUserDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsLandlordUser]
+
+    def delete(self, request):
+        landlord_user = request.user.landlord_user
+
+        if landlord_user:
+            landlord_user.delete()
+
+        return Response({'message':'landlord user deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class TenantUserDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsTenantUser]
+
+    def delete(self, request):
+        tenant_user = request.user.tenant_user
+
+        if tenant_user:
+            tenant_user.delete()
+
+        return Response({'message':'tenant user deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
 
