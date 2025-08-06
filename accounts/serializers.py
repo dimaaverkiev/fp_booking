@@ -7,6 +7,8 @@ from rest_framework import serializers
 from accounts.models import LandlordUser, TenantUser
 from django.core.exceptions import ValidationError as DjangoValidationError
 
+
+
 User = get_user_model()
 
 class BaseSignupSerializer(serializers.Serializer):
@@ -86,7 +88,6 @@ class LandlordSignupSerializer(BaseSignupSerializer):
             LandlordUser.objects.create(user=user)
 
         return user
-
 
 
 

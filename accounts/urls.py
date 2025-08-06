@@ -1,14 +1,16 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from accounts.views import (TenantSignupView, LandlordSignupView, LoginView)
+from django.urls import path
 
-# router = DefaultRouter()
-# router.register(r'login', LoginView, basename='login')
+from accounts.views import (TenantSignupView, LandlordSignupView, LoginView, LogoutView,)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 urlpatterns = [
-    # path('', include(router.urls)),
-    path('signup_tenant/', TenantSignupView.as_view(), name='signup_tenant'),
-    path('signup_landlord/', LandlordSignupView.as_view(), name='signup_landlord'),
+    path('api/signup_tenant/', TenantSignupView.as_view(), name='signup_tenant'),
+    path('api/signup_landlord/', LandlordSignupView.as_view(), name='signup_landlord'),
+    path('api/token/', TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name="token_refresh"),
+    path('api/login/', LoginView.as_view(), name="login"),
+    path('api/logout/', LogoutView.as_view(), name='logout'),
 ]
 
 

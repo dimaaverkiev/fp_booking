@@ -20,6 +20,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 
+
 def set_jwt_cookie(response, user):
     from datetime import datetime, timezone
     refresh_token = RefreshToken.for_user(user)
@@ -46,6 +47,7 @@ def set_jwt_cookie(response, user):
     )
 
 
+
 class BaseSignupView(APIView):
     permission_classes = [AllowAny]
     serializer_class = None
@@ -61,23 +63,85 @@ class BaseSignupView(APIView):
         return response
 
 
+
 class LandlordSignupView(BaseSignupView):
     serializer_class = LandlordSignupSerializer
+
 
 
 class TenantSignupView(BaseSignupView):
     serializer_class = TenantSignupSerializer
 
 
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
-    pass
+
+    def post(self, request, *args, **kwargs):
+        from datetime import datetime, timezone
+
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({"detail": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None and user.is_active:
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
+            access_expiry = datetime.fromtimestamp(access_token['exp'], timezone.utc)
+            refresh_expiry = datetime.fromtimestamp(refresh['exp'], timezone.utc)
+
+            response = Response(status=status.HTTP_200_OK)
+            response.set_cookie(
+                key='access_token',
+                value=str(access_token),
+                httponly=True,
+                secure=False,
+                samesite='Lax',
+                expires=access_expiry,
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                secure=False,
+                samesite='Lax',
+                expires=refresh_expiry,
+            )
+            return response
+        else:
+            return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            refresh_token = request.COOKIES.get('refresh_token')
+
+            if refresh_token is None:
+                return Response({"detail": "Refresh token not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+        except TokenError as e:
+            return Response({"detail": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        response = Response({'message': 'Login successful'}, status=status.HTTP_204_NO_CONTENT)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+
+        return response
 
 
-
-
-
+# {
+# "email":"user1@user.com",
+# "password":"user1user1"
+# }
 
