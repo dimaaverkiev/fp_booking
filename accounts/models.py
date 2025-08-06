@@ -1,6 +1,7 @@
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.base_user import  BaseUserManager
+from django.contrib.auth.models import  AbstractUser
 from django.db import models
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -24,22 +25,20 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, blank=True)
+
+class User(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
-    birthday = models.DateField(null=True, blank=True)
-    address = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    passport_id = models.CharField(max_length=255, blank=True)
-    username = models.CharField(max_length=255, null=True, blank=True)
-
-    is_landlord = models.BooleanField(default=False)
-    is_tenant = models.BooleanField(default=False)
-
+    username = None
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    birthday = models.DateField(null=True, blank=True)
+    address = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    passport_id = models.CharField(max_length=255)
+
+
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -51,17 +50,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 
+class LandlordUser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='landlord_user')
 
 
-
-
-
-
-
-
-
-
-
+class TenantUser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tenant_user')
 
 
 

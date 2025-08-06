@@ -15,7 +15,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import User
-from accounts.serializers import RegisterSerializerTenant, RegisterSerializerLandlord
+from accounts.serializers import TenantSignupSerializer, LandlordSignupSerializer
 from rest_framework.decorators import api_view, action
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -46,45 +46,27 @@ def set_jwt_cookie(response, user):
     )
 
 
-
 class BaseSignupView(APIView):
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
+    serializer_class = None
 
-    def _post(self, request, role_serializer):
-        serializer = role_serializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = serializer.save()
-            except Exception as e:
-                return Response({"detail" : str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        response = Response(serializer.data, status=status.HTTP_201_CREATED)
 
-            response = Response({'user': {
-                                        'first_name': user.first_name,
-                                        'last_name': user.last_name,
-                                        'email': user.email,
-                    }
-            }, status=status.HTTP_201_CREATED)
+        set_jwt_cookie(response, user)
 
-            set_jwt_cookie(response, user)
-            return response
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return response
 
 
 class LandlordSignupView(BaseSignupView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        return self._post(request, RegisterSerializerLandlord)
-
+    serializer_class = LandlordSignupSerializer
 
 
 class TenantSignupView(BaseSignupView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        return self._post(request, RegisterSerializerTenant)
+    serializer_class = TenantSignupSerializer
 
 
 class LoginView(APIView):
