@@ -1,25 +1,12 @@
-from _pyrepl.commands import refresh
-from datetime import date, timedelta
 from django.contrib.auth import authenticate
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q, Count
-from django.db.models.functions import ExtractWeekDay
-from django.http import HttpResponse
-from django.utils import timezone
-from rest_framework import status, filters
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from accounts.models import User
 from accounts.permission import IsLandlordUser, IsTenantUser
 from accounts.serializers import TenantSignupSerializer, LandlordSignupSerializer, UserUpdateSerializer
-from rest_framework.decorators import api_view, action
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
 
 
 def set_jwt_cookie(response, user):

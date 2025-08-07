@@ -158,11 +158,3 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.updated_at = timezone.now()
         instance.save()
         return instance
-
-
-
-
-
-
-
-

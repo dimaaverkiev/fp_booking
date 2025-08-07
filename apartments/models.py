@@ -32,8 +32,8 @@ class FederalState(models.Model):
 
 class ApartmentAddress(models.Model):
     street = models.CharField(max_length=100)
-    house_number = models.PositiveIntegerField()
-    index_number = models.PositiveIntegerField()
+    house_number = models.CharField(max_length=5)
+    index_number = models.CharField(max_length=5)
     city = models.CharField(max_length=100)
     federal_state = models.ForeignKey(FederalState, on_delete=models.CASCADE, related_name='apartment_addresses')
     country = models.CharField(max_length=50, default='Germany')
