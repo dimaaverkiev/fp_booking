@@ -59,8 +59,8 @@ class UpdateApartmentSerializer(serializers.ModelSerializer):
     title = serializers.CharField(allow_null=True, allow_blank=True, required=False)
     description = serializers.CharField(allow_null=True, allow_blank=True, required=False)
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), allow_null=True, required=False)
-    price = serializers.DecimalField(allow_null=True, allow_blank=True, required=False, decimal_places=2, max_digits=10)
-    rooms = serializers.DecimalField(allow_null=True, allow_blank=True, required=False, decimal_places=1, max_digits=4)
+    price = serializers.DecimalField(allow_null=True, required=False, decimal_places=2, max_digits=10)
+    rooms = serializers.DecimalField(allow_null=True, required=False, decimal_places=1, max_digits=4)
     address = serializers.PrimaryKeyRelatedField(queryset=ApartmentAddress.objects.all(), allow_null=True, required=False)
 
     class Meta:
