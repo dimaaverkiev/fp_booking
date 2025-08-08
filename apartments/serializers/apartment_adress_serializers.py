@@ -24,6 +24,8 @@ class CreateApartmentAddressSerializer(serializers.ModelSerializer):
         fields = ('street', 'house_number', 'index_number', 'city', 'federal_state', 'country')
 
     def validate_index_number(self, value):
+        if len(value) != 5:
+            raise serializers.ValidationError('Index number must be 5 characters long.')
         for vel in value:
             if not vel.isdigit():
                 raise serializers.ValidationError('Index number must be digit')

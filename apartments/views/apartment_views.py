@@ -1,6 +1,8 @@
-from rest_framework import filters
+from rest_framework import filters, status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from apartments.models import Apartment
 from apartments.serializers.apartment_serializers import (ListApartmentSerializer, DeleteApartmentSerializer,
                                                           CreateApartmentSerializer, UpdateApartmentSerializer,
@@ -11,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 
-class CreateApartmentView(ListCreateAPIView):
+class CreateListApartmentView(ListCreateAPIView):
     permission_classes = [IsLandlordUser]
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['created_at', 'booking_count']
@@ -23,7 +25,7 @@ class CreateApartmentView(ListCreateAPIView):
 
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
-        return Apartment.objects.filter(owner=landlord)
+        return Apartment.objects.filter(owner=landlord, is_active=True)
 
 
 
@@ -32,16 +34,18 @@ class DetailApartmentView(ListAPIView):
     serializer_class = ListApartmentSerializer
     queryset = Apartment.objects.filter(is_active=True)
 
+
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
-    filterset_fields = ['created_at', 'booking_count']
+    filterset_fields = ['category', 'address__federal_state']
     search_fields = ['title', 'description']
-    ordering_fields = ['created_at']
+    ordering_fields = ['created_at', 'booking_count', 'price']
 
 
 
 
 class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerLandlordOrReadOnly]
+    queryset = Apartment.objects.filter(is_active=True)
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -51,9 +55,16 @@ class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
         else:
             return ListApartmentSerializer
 
+
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
         return Apartment.objects.filter(owner=landlord)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_active = False
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

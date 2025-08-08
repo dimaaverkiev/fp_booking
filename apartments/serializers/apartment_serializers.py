@@ -1,10 +1,11 @@
+from django.utils import timezone
 from rest_framework import serializers
+
+from accounts.models import LandlordUser
 from apartments.models import Apartment, Category, ApartmentAddress
 from apartments.serializers.category_serializers import ListCategorySerializer
-from apartments.serializers.apartment_adress_serializers import ListApartmentAddressSerializer, ShortInfoApartmentAddressSerializer
-
-
-
+from apartments.serializers.apartment_adress_serializers import ListApartmentAddressSerializer, \
+    ShortInfoApartmentAddressSerializer, CreateApartmentAddressSerializer, UpdateApartmentAddressSerializer
 
 
 class ShortInfoApartmentSerializer(serializers.ModelSerializer):
@@ -30,7 +31,7 @@ class ListApartmentSerializer(serializers.ModelSerializer):
 
 class CreateApartmentSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    address = serializers.PrimaryKeyRelatedField(queryset=ApartmentAddress.objects.all())
+    address = CreateApartmentAddressSerializer()
 
     class Meta:
         model = Apartment
@@ -49,7 +50,12 @@ class CreateApartmentSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        address_data = validated_data.pop('address')
+        address = ApartmentAddress.objects.create(**address_data)
+
+        validated_data['address'] = address
+        landlord = LandlordUser.objects.get(user=self.context['request'].user)
+        validated_data['owner'] = landlord
         return super().create(validated_data)
 
 
@@ -61,7 +67,7 @@ class UpdateApartmentSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), allow_null=True, required=False)
     price = serializers.DecimalField(allow_null=True, required=False, decimal_places=2, max_digits=10)
     rooms = serializers.DecimalField(allow_null=True, required=False, decimal_places=1, max_digits=4)
-    address = serializers.PrimaryKeyRelatedField(queryset=ApartmentAddress.objects.all(), allow_null=True, required=False)
+    address = UpdateApartmentAddressSerializer(allow_null=True, required=False)
 
     class Meta:
         model = Apartment
@@ -69,9 +75,19 @@ class UpdateApartmentSerializer(serializers.ModelSerializer):
         read_only_fields = ('updated_at',)
 
     def update(self, instance, validated_data):
+        address_data = validated_data.pop('address', None)
+        if address_data:
+            address = instance.address
+            for attr, value in address_data.items():
+                if value not in [None, ""]:
+                    setattr(address, attr, value)
+            address.save()
+
         for attr, value in validated_data.items():
             if value not in [None, ""]:
                 setattr(instance, attr, value)
+
+        instance.updated_at = timezone.now()
 
         instance.save()
         return instance
