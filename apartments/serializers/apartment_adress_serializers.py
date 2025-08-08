@@ -3,12 +3,15 @@ from apartments.models import ApartmentAddress, FederalState
 from apartments.serializers.federal_state_serializers import ListFederalStateSerializer
 
 
+
+
 class ListApartmentAddressSerializer(serializers.ModelSerializer):
     federal_state = ListFederalStateSerializer()
 
     class Meta:
         model = ApartmentAddress
         fields = ('id', 'street', 'house_number', 'index_number', 'city', 'federal_state', 'country')
+
 
 
 
@@ -34,6 +37,8 @@ class ShortInfoApartmentAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApartmentAddress
         fields = ('id', 'city', 'country')
+
+
 
 
 class UpdateApartmentAddressSerializer(serializers.ModelSerializer):

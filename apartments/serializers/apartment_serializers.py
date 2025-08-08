@@ -2,7 +2,7 @@ from rest_framework import serializers
 from apartments.models import Apartment, Category, ApartmentAddress
 from apartments.serializers.category_serializers import ListCategorySerializer
 from apartments.serializers.apartment_adress_serializers import ListApartmentAddressSerializer, ShortInfoApartmentAddressSerializer
-from apartments.serializers.federal_state_serializers import ListFederalStateSerializer
+
 
 
 
