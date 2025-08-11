@@ -1,3 +1,72 @@
-from django.shortcuts import render
+from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from accounts.permission import IsLandlordUser, IsTenantUser, IsOwnerTenantOrReadOnly
+from bookings.models import Booking
+from bookings.serializers import ListBookingSerializer, CreateBookingSerializer, StatusUpdateBookingSerializer
 
-# Create your views here.
+
+class CreateListBookingView(ListCreateAPIView):
+    permission_classes = [IsTenantUser]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ['start_date', 'end_date', 'status']
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ListBookingSerializer
+        return CreateBookingSerializer
+
+    def get_queryset(self):
+        tenant = getattr(self.request.user, 'tenant_user', None)
+        return Booking.objects.filter(user=tenant)
+
+
+
+class LandlordListUpdateStatusBookingView(RetrieveUpdateAPIView):
+    permission_classes = [IsLandlordUser, IsAdminUser]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ListBookingSerializer
+        return StatusUpdateBookingSerializer
+
+    def get_queryset(self):
+        landlord = getattr(self.request.user, 'landlord_user', None)
+        return Booking.objects.filter(apartment__owner=landlord)
+
+
+
+
+class DeleteBookingView(DestroyAPIView):
+    permission_classes = [IsOwnerTenantOrReadOnly, IsAdminUser]
+
+    def destroy(self, request, *args, **kwargs):
+        booking = self.get_object()
+        if booking.start_date <= timezone.now().date():
+            return Response({"error": "You cannot delete a booking that has started or finished."}, status=400)
+        return super().destroy(request, *args, **kwargs)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

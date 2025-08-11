@@ -1,8 +1,7 @@
 from rest_framework import filters, status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-
 from apartments.models import Apartment
 from apartments.serializers.apartment_serializers import (ListApartmentSerializer, DeleteApartmentSerializer,
                                                           CreateApartmentSerializer, UpdateApartmentSerializer,
@@ -44,7 +43,7 @@ class DetailApartmentView(ListAPIView):
 
 
 class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwnerLandlordOrReadOnly]
+    permission_classes = [IsOwnerLandlordOrReadOnly, IsAdminUser]
     queryset = Apartment.objects.filter(is_active=True)
 
     def get_serializer_class(self):
