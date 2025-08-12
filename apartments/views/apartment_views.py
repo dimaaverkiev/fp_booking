@@ -43,7 +43,7 @@ class DetailApartmentView(ListAPIView):
 
 
 class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwnerLandlordOrReadOnly, IsAdminUser]
+    permission_classes = [IsOwnerLandlordOrReadOnly | IsAdminUser]
     queryset = Apartment.objects.filter(is_active=True)
 
     def get_serializer_class(self):

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from accounts.models import TenantUser
@@ -14,7 +15,7 @@ class CreateBookingSerializer(ModelSerializer):
     class Meta:
         model = Booking
         fields = ('apartment', 'user', 'status', 'start_date', 'end_date', 'total_price', 'booking_at')
-        read_only_fields = ('booking_at', 'total_price', 'status')
+        read_only_fields = ('booking_at', 'total_price', 'status', 'user')
 
 
     def validate(self, attrs):
@@ -24,6 +25,9 @@ class CreateBookingSerializer(ModelSerializer):
 
         if start_date >= end_date:
             raise serializers.ValidationError("End date must be after start date.")
+
+        if start_date < timezone.now().date():
+            raise serializers.ValidationError("Start date must be today or later.")
 
         overlap_exists = Booking.objects.filter(
             apartment=apartment,
@@ -46,6 +50,11 @@ class CreateBookingSerializer(ModelSerializer):
         days_count = (validated_data['end_date'] - validated_data['start_date']).days
         validated_data['total_price'] = price * days_count
 
+        apartment = validated_data['apartment']
+        apartment.booking_count += 1
+        apartment.save(update_fields=['booking_count'])
+
+
         return super().create(validated_data)
 
 
@@ -60,12 +69,11 @@ class ListBookingSerializer(ModelSerializer):
 
 
 class StatusUpdateBookingSerializer(ModelSerializer):
-    apartment = ShortInfoApartmentSerializer()
 
     class Meta:
         model = Booking
-        fields = ('id', 'apartment', 'status', 'user', 'start_date', 'end_date', 'total_price', 'booking_at')
-        read_only_fields = ('id', 'apartment', 'user', 'start_date', 'end_date', 'total_price', 'booking_at')
+        fields = ('id', 'status')
+        # read_only_fields = ('id', 'apartment', 'user', 'start_date', 'end_date', 'total_price', 'booking_at')
 
 
 

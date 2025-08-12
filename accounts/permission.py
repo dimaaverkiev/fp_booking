@@ -33,4 +33,12 @@ class IsOwnerTenantOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
-        return obj.owner == request.user.tenant_user
+
+        if hasattr(obj, 'user'):
+            return obj.user == getattr(request.user, 'tenant_user', None)
+
+        if hasattr(obj, 'booking'):
+            return obj.booking.owner == getattr(request.user, 'tenant_user', None)
+
+
+        return False

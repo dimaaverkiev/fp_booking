@@ -128,11 +128,6 @@ class LogoutView(APIView):
         return response
 
 
-# {
-# "email":"user1@user.com",
-# "password":"user1user1"
-# }
-
 
 class UserUpdateView(APIView):
     permission_classes = [IsAuthenticated]
