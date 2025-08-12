@@ -14,7 +14,7 @@ class Review(models.Model):
 
     rating = models.CharField(max_length=10, choices=RATING_CHOICES)
     review_text = models.TextField()
-    user = models.ForeignKey(TenantUser, on_delete=models.PROTECT, related_name='reviews')
+    user = models.ForeignKey(TenantUser, on_delete=models.CASCADE, related_name='reviews')
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='reviews')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -22,6 +22,7 @@ class Review(models.Model):
         db_table = 'review'
         verbose_name = 'Review'
         verbose_name_plural = 'Reviews'
+        ordering = ['-created_at']
 
         constraints = [
             models.UniqueConstraint(fields=['booking'], name='unique_booking_review')

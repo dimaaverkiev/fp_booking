@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from accounts.models import TenantUser
 from bookings.models import Booking
@@ -16,22 +17,21 @@ class CreateReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'created_at')
 
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self.context['request'].user.tenant_user
+        self.fields['booking'].queryset = Booking.objects.filter(user=user, end_date__lte=timezone.now())
+
+
     def validate(self, attrs):
         booking = attrs.get('booking')
 
-        # Проверка: отзыв уже существует?
         if Review.objects.filter(booking=booking).exists():
             raise serializers.ValidationError(
-                {"booking": "Отзыв для этой брони уже был оставлен."}
+                {"booking": "Review already exists for this booking."}
             )
 
         return attrs
-
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        user = self.context['request'].user
-        self.fields['booking'].queryset = Booking.objects.filter(user=user)
 
 
     def create(self, validated_data):

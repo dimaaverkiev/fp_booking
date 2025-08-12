@@ -1,9 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView, ListAPIView, \
-    RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAdminUser
-
-from accounts.permission import IsLandlordUser, IsTenantUser, IsOwnerTenantOrReadOnly
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from accounts.permission import IsLandlordUser, IsTenantUser
+from apartments.serializers.apartment_serializers import ShortInfoApartmentSerializer
 from reviews.models import Review
 from reviews.serializers import ListReviewSerializer, CreateReviewSerializer, UpdateDeleteReviewSerializer
 
@@ -19,7 +18,7 @@ class CreateListReviewView(ListCreateAPIView):
         return CreateReviewSerializer
 
     def get_queryset(self):
-        tenant = getattr(self.request, 'tenant_user', None)
+        tenant = getattr(self.request.user, 'tenant_user', None)
         return Review.objects.filter(user=tenant)
 
 
@@ -33,8 +32,8 @@ class LandlordListReviewView(ListAPIView):
     ordering_fields = ('rating', 'created_at')
 
     def get_queryset(self):
-        landlord = getattr(self.request, 'landlord_user', None)
-        return Review.objects.filter(booking__apartment__owner=landlord)
+        landlord = getattr(self.request.user, 'landlord_user', None)
+        return Review.objects.filter(booking__apartment__owner=landlord, booking__apartment__is_active=True)
 
 
 
@@ -44,11 +43,23 @@ class UpdateDeleteReviewView(RetrieveUpdateDestroyAPIView):
     serializer_class =  UpdateDeleteReviewSerializer
 
     def get_queryset(self):
-        tenant = getattr(self.request, 'tenant_user', None)
+        tenant = getattr(self.request.user, 'tenant_user', None)
         return Review.objects.filter(user=tenant)
 
 
 
+class ApartmentListReviewView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ListReviewSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('rating',)
+    ordering_fields = ('rating', 'created_at')
 
+    def get_queryset(self):
+        apartment_id = self.kwargs.get('apartment_id')
+        return Review.objects.filter(
+            booking__apartment__id=apartment_id,
+            booking__apartment__is_active=True
+        )
 
 

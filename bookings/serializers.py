@@ -10,7 +10,7 @@ from bookings.models import Booking
 
 
 class CreateBookingSerializer(ModelSerializer):
-    apartment = serializers.PrimaryKeyRelatedField(queryset=Apartment.objects.all())
+    apartment = serializers.PrimaryKeyRelatedField(queryset=Apartment.objects.filter(is_active=True))
 
     class Meta:
         model = Booking

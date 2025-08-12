@@ -36,7 +36,7 @@ class UpdateDeleteApartmentAddressView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
-        return ApartmentAddress.objects.filter(apartment__owner=landlord)
+        return ApartmentAddress.objects.filter(apartment__owner=landlord, apartment__is_active=True)
 
 
 

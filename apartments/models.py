@@ -57,7 +57,7 @@ class Apartment(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
-    owner = models.ForeignKey(LandlordUser, on_delete=models.PROTECT, related_name='apartments')
+    owner = models.ForeignKey(LandlordUser, on_delete=models.CASCADE, related_name='apartments')
     address = models.OneToOneField(ApartmentAddress, on_delete=models.CASCADE, related_name='apartment')
     booking_count = models.PositiveIntegerField(default=0)
 

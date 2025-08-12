@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView, ListAPIView
@@ -62,6 +64,9 @@ class DeleteBookingView(DestroyAPIView):
         booking = self.get_object()
         if booking.start_date <= timezone.now().date():
             return Response({"error": "You cannot delete a booking that has started or finished."}, status=400)
+
+        if booking.start_date - timedelta(days=7) <= timezone.now().date():
+            return Response({"error": "You cannot delete a booking 7 days before start."}, status=400)
 
         apartment = booking.apartment
         if apartment.booking_count > 0:

@@ -9,7 +9,7 @@ from apartments.serializers.apartment_serializers import (ListApartmentSerialize
 from accounts.permission import IsLandlordUser, IsOwnerLandlordOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 
-
+from apartments.views.filters import ApartmentFilter
 
 
 class CreateListApartmentView(ListCreateAPIView):
@@ -34,11 +34,10 @@ class DetailApartmentView(ListAPIView):
     queryset = Apartment.objects.filter(is_active=True)
 
 
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
-    filterset_fields = ['category', 'address__federal_state']
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter,)
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'booking_count', 'price']
-
+    filterset_class = ApartmentFilter
 
 
 
@@ -57,7 +56,7 @@ class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
-        return Apartment.objects.filter(owner=landlord)
+        return Apartment.objects.filter(owner=landlord, is_active=True)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
