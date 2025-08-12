@@ -1,6 +1,5 @@
 from django.utils import timezone
 from rest_framework import serializers
-
 from accounts.models import LandlordUser
 from apartments.models import Apartment, Category, ApartmentAddress
 from apartments.serializers.category_serializers import ListCategorySerializer
