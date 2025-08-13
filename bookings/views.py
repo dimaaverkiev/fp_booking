@@ -65,7 +65,7 @@ class DeleteBookingView(DestroyAPIView):
         if booking.start_date <= timezone.now().date():
             return Response({"error": "You cannot delete a booking that has started or finished."}, status=400)
 
-        if booking.start_date - timedelta(days=7) <= timezone.now().date():
+        if booking.start_date - timedelta(days=7) <= timezone.now().date() and booking.status == 'A':
             return Response({"error": "You cannot delete a booking 7 days before start."}, status=400)
 
         apartment = booking.apartment
@@ -74,8 +74,6 @@ class DeleteBookingView(DestroyAPIView):
             apartment.save(update_fields=['booking_count'])
 
         return super().destroy(request, *args, **kwargs)
-
-
 
 
 

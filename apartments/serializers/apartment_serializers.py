@@ -70,7 +70,7 @@ class UpdateApartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apartment
-        fields = ('title', 'description', 'category', 'price', 'rooms', 'updated_at', 'address')
+        fields = ('title', 'description', 'category', 'price', 'rooms', 'updated_at', 'address', 'is_active')
         read_only_fields = ('updated_at',)
 
     def update(self, instance, validated_data):
@@ -92,15 +92,3 @@ class UpdateApartmentSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
-class DeleteApartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Apartment
-        fields = ('title', 'is_active')
-        read_only_fields = ('title',)
-
-    def update(self, instance, validated_data):
-        instance.is_active = False
-        instance.save()
-        return instance

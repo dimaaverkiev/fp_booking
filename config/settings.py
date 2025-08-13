@@ -90,6 +90,10 @@ if USE_MYSQL:
             "PASSWORD": os.getenv("MYSQL_PASSWORD"),
             "HOST": os.getenv("MYSQL_HOST"),
             "PORT": os.getenv("MYSQL_PORT"),
+            "OPTIONS": {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8',
+            }
         }
     }
 else:

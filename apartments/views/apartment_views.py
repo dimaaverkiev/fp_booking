@@ -1,9 +1,10 @@
 from rest_framework import filters, status
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, RetrieveUpdateAPIView, \
+    DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from apartments.models import Apartment
-from apartments.serializers.apartment_serializers import (ListApartmentSerializer, DeleteApartmentSerializer,
+from apartments.serializers.apartment_serializers import (ListApartmentSerializer,
                                                           CreateApartmentSerializer, UpdateApartmentSerializer,
                                                           )
 from accounts.permission import IsLandlordUser, IsOwnerLandlordOrReadOnly
@@ -43,26 +44,21 @@ class DetailApartmentView(ListAPIView):
 
 class UpdateDeleteApartmentView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerLandlordOrReadOnly | IsAdminUser]
-    queryset = Apartment.objects.filter(is_active=True)
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return UpdateApartmentSerializer
-        elif self.request.method == 'DELETE':
-            return DeleteApartmentSerializer
         else:
             return ListApartmentSerializer
 
 
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
-        return Apartment.objects.filter(owner=landlord, is_active=True)
+        return Apartment.objects.filter(owner=landlord)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.is_active = False
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 
 
 
