@@ -3,10 +3,12 @@ from apartments.models import FederalState
 
 
 
+
 class ListFederalStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FederalState
         fields = ('id', 'name')
+
 
 
 

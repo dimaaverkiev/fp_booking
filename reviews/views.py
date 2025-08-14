@@ -2,9 +2,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from accounts.permission import IsLandlordUser, IsTenantUser
-from apartments.serializers.apartment_serializers import ShortInfoApartmentSerializer
 from reviews.models import Review
 from reviews.serializers import ListReviewSerializer, CreateReviewSerializer, UpdateDeleteReviewSerializer
+
+
 
 
 class CreateListReviewView(ListCreateAPIView):
@@ -45,6 +46,7 @@ class UpdateDeleteReviewView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         tenant = getattr(self.request.user, 'tenant_user', None)
         return Review.objects.filter(user=tenant)
+
 
 
 

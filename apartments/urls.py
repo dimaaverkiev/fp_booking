@@ -3,6 +3,7 @@ from apartments.views.apartment_views import CreateListApartmentView, DetailApar
 
 
 
+
 urlpatterns = [
     # All active Apartments for authenticated users
     path('', DetailApartmentView.as_view(), name='detail'),

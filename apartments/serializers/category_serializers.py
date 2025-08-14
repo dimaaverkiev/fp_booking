@@ -3,10 +3,13 @@ from apartments.models import Category
 
 
 
+
 class ListCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name')
+
+
 
 
 class CreateUpdateCategorySerializer(serializers.ModelSerializer):

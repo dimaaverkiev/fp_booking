@@ -1,8 +1,9 @@
 from django.urls import path
-
 from accounts.views import (TenantSignupView, LandlordSignupView, LoginView, LogoutView, UserUpdateView,
                             LandlordUserDeleteView, TenantUserDeleteView, )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+
 
 
 urlpatterns = [

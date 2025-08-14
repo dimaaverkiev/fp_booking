@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 
 
+
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -26,6 +28,7 @@ class UserManager(BaseUserManager):
 
 
 
+
 class User(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
     username = None
@@ -38,8 +41,6 @@ class User(AbstractUser):
     passport_id = models.CharField(max_length=255)
 
 
-
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -50,8 +51,11 @@ class User(AbstractUser):
 
 
 
+
 class LandlordUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='landlord_user')
+
+
 
 
 class TenantUser(models.Model):

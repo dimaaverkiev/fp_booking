@@ -7,6 +7,8 @@ from apartments.serializers.apartment_adress_serializers import ListApartmentAdd
     ShortInfoApartmentAddressSerializer, CreateApartmentAddressSerializer, UpdateApartmentAddressSerializer
 
 
+
+
 class ShortInfoApartmentSerializer(serializers.ModelSerializer):
     address = ShortInfoApartmentAddressSerializer()
 

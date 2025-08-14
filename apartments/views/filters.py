@@ -2,6 +2,8 @@ import django_filters
 from apartments.models import Apartment, Category
 
 
+
+
 class ApartmentFilter(django_filters.FilterSet):
     price_min = django_filters.NumberFilter(field_name="price", lookup_expr='gte')
     price_max = django_filters.NumberFilter(field_name="price", lookup_expr='lte')

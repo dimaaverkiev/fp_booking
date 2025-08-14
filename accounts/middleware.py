@@ -4,6 +4,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 
+
+
 class JWTAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         access_token = request.COOKIES.get('access_token')
@@ -43,8 +45,8 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
                 key='access_token',
                 value=new_access_token,
                 httponly=True,
-                secure=False,  # ❗ В проде: True
-                samesite='Lax',  # ❗ В проде: 'Strict'
+                secure=False,
+                samesite='Lax',
                 expires=datetime.fromtimestamp(access_expiry, timezone.utc),
             )
 

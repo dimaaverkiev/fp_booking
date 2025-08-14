@@ -3,6 +3,7 @@ from django.db import models
 
 
 
+
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -13,6 +14,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 
@@ -48,6 +50,7 @@ class ApartmentAddress(models.Model):
 
 
 
+
 class Apartment(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -69,27 +72,5 @@ class Apartment(models.Model):
 
     def __str__(self):
         return self.title
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

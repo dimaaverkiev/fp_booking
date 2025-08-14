@@ -3,6 +3,8 @@ from accounts.models import TenantUser
 from bookings.models import Booking
 
 
+
+
 class Review(models.Model):
     RATING_CHOICES = [
         ('1', 'Very poor'),

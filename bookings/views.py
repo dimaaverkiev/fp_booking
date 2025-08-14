@@ -1,5 +1,4 @@
 from datetime import timedelta
-
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView, ListAPIView
@@ -8,6 +7,8 @@ from rest_framework.response import Response
 from accounts.permission import IsLandlordUser, IsTenantUser, IsOwnerTenantOrReadOnly
 from bookings.models import Booking
 from bookings.serializers import ListBookingSerializer, CreateBookingSerializer, StatusUpdateBookingSerializer
+
+
 
 
 class CreateListBookingView(ListCreateAPIView):
@@ -26,6 +27,7 @@ class CreateListBookingView(ListCreateAPIView):
 
 
 
+
 class LandlordListBookingView(ListAPIView):
     permission_classes = [IsLandlordUser | IsAdminUser]
     serializer_class = ListBookingSerializer
@@ -33,7 +35,6 @@ class LandlordListBookingView(ListAPIView):
     def get_queryset(self):
         landlord = getattr(self.request.user, 'landlord_user', None)
         return Booking.objects.filter(apartment__owner=landlord)
-
 
 
 

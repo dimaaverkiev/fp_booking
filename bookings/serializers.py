@@ -59,12 +59,14 @@ class CreateBookingSerializer(ModelSerializer):
 
 
 
+
 class ListBookingSerializer(ModelSerializer):
     apartment = ShortInfoApartmentSerializer()
 
     class Meta:
         model = Booking
         fields = ('id', 'apartment', 'status', 'user', 'start_date', 'end_date', 'total_price', 'booking_at')
+
 
 
 

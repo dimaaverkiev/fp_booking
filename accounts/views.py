@@ -9,6 +9,8 @@ from accounts.permission import IsLandlordUser, IsTenantUser
 from accounts.serializers import TenantSignupSerializer, LandlordSignupSerializer, UserUpdateSerializer
 
 
+
+
 def set_jwt_cookie(response, user):
     from datetime import datetime, timezone
     refresh_token = RefreshToken.for_user(user)
@@ -36,6 +38,7 @@ def set_jwt_cookie(response, user):
 
 
 
+
 class BaseSignupView(APIView):
     permission_classes = [AllowAny]
     serializer_class = None
@@ -52,13 +55,16 @@ class BaseSignupView(APIView):
 
 
 
+
 class LandlordSignupView(BaseSignupView):
     serializer_class = LandlordSignupSerializer
 
 
 
+
 class TenantSignupView(BaseSignupView):
     serializer_class = TenantSignupSerializer
+
 
 
 
@@ -105,6 +111,7 @@ class LoginView(APIView):
 
 
 
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -129,6 +136,7 @@ class LogoutView(APIView):
 
 
 
+
 class UserUpdateView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserUpdateSerializer
@@ -150,6 +158,8 @@ class UserUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
 class LandlordUserDeleteView(APIView):
     permission_classes = [IsAuthenticated, IsLandlordUser]
 
@@ -160,6 +170,8 @@ class LandlordUserDeleteView(APIView):
             landlord_user.delete()
 
         return Response({'message':'landlord user deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 class TenantUserDeleteView(APIView):

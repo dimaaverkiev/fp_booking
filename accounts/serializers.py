@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 
+
 User = get_user_model()
 
 class BaseSignupSerializer(serializers.Serializer):
@@ -38,6 +39,7 @@ class BaseSignupSerializer(serializers.Serializer):
         except DjangoValidationError as e:
             raise serializers.ValidationError(e.messages)
         return value
+
 
 
 
@@ -91,6 +93,7 @@ class LandlordSignupSerializer(BaseSignupSerializer):
 
 
 
+
 class TenantSignupSerializer(BaseSignupSerializer):
     is_tenant = serializers.SerializerMethodField(read_only=True)
 
@@ -137,6 +140,7 @@ class TenantSignupSerializer(BaseSignupSerializer):
             TenantUser.objects.create(user=user)
 
         return user
+
 
 
 

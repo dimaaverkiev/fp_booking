@@ -3,6 +3,8 @@ from apartments.models import Apartment
 from accounts.models import TenantUser
 
 
+
+
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('A', 'Approved'),
